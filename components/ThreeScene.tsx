@@ -1,7 +1,54 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, Float, MeshTransmissionMaterial, ContactShadows, PerspectiveCamera, Stars, RoundedBox, Text } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Augment JSX namespace to include R3F intrinsic elements to fix TS errors
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      group: any;
+      mesh: any;
+      meshStandardMaterial: any;
+      meshBasicMaterial: any;
+      circleGeometry: any;
+      planeGeometry: any;
+      boxGeometry: any;
+      cylinderGeometry: any;
+      sphereGeometry: any;
+      torusGeometry: any;
+      dodecahedronGeometry: any;
+      instancedMesh: any;
+      ambientLight: any;
+      pointLight: any;
+      spotLight: any;
+      extrudeGeometry: any;
+    }
+  }
+}
+
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements {
+      group: any;
+      mesh: any;
+      meshStandardMaterial: any;
+      meshBasicMaterial: any;
+      circleGeometry: any;
+      planeGeometry: any;
+      boxGeometry: any;
+      cylinderGeometry: any;
+      sphereGeometry: any;
+      torusGeometry: any;
+      dodecahedronGeometry: any;
+      instancedMesh: any;
+      ambientLight: any;
+      pointLight: any;
+      spotLight: any;
+      extrudeGeometry: any;
+    }
+  }
+}
 
 const NotificationBubble = ({ position, delay, color = "#e11d48" }: { position: [number, number, number], delay: number, color?: string }) => {
   const ref = useRef<THREE.Group>(null);
@@ -71,31 +118,35 @@ const FloatingWidget = ({ position }: { position: [number, number, number] }) =>
     }
   });
 
+  // Create a bookmark shape path
+  const bookmarkShape = useMemo(() => {
+    const shape = new THREE.Shape();
+    const width = 0.25;
+    const height = 0.35;
+    
+    shape.moveTo(-width, height);
+    shape.lineTo(width, height);
+    shape.lineTo(width, -height);
+    shape.lineTo(0, -height + 0.15); // V-cut bottom
+    shape.lineTo(-width, -height);
+    shape.closePath();
+    
+    return shape;
+  }, []);
+
   return (
     <group ref={mesh} position={position}>
       <Float speed={4} rotationIntensity={1} floatIntensity={1}>
-         {/* Widget Body - A rounded square/squircle */}
+         {/* Widget Body - Red Square (Kept as requested) */}
          <RoundedBox args={[1.2, 1.2, 0.2]} radius={0.4} smoothness={4}>
             <meshStandardMaterial color="#e11d48" roughness={0.2} metalness={0.5} />
          </RoundedBox>
          
-         {/* Front Face Detail - Question Mark abstraction */}
+         {/* Front Face Detail - Bookmark Icon */}
          <group position={[0, 0, 0.11]}>
-             <mesh position={[0, 0.2, 0]}>
-                 <torusGeometry args={[0.2, 0.08, 16, 32, Math.PI]} />
-                 <meshBasicMaterial color="white" />
-             </mesh>
-             <mesh position={[0.19, 0.1, 0]}>
-                  <cylinderGeometry args={[0.08, 0.08, 0.2, 16]} />
-                  <meshBasicMaterial color="white" />
-             </mesh>
-             <mesh position={[0, -0.1, 0]}>
-                  <cylinderGeometry args={[0.08, 0.08, 0.2, 16]} />
-                  <meshBasicMaterial color="white" />
-             </mesh>
-             <mesh position={[0, -0.4, 0]}>
-                 <sphereGeometry args={[0.08, 16, 16]} />
-                 <meshBasicMaterial color="white" />
+             <mesh>
+                <extrudeGeometry args={[bookmarkShape, { depth: 0.04, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 3 }]} />
+                <meshStandardMaterial color="white" roughness={0.4} metalness={0.2} />
              </mesh>
          </group>
 

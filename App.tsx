@@ -1,11 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import Scene from './components/ThreeScene';
-import { Button, SectionTitle, GradientBlob } from './components/UiComponents';
-import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Button, SectionTitle, GradientBlob, LaterLogo } from './components/UiComponents';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, Plus, Minus } from 'lucide-react';
 
 const PricingCard: React.FC<{ plan: string; price: string; features: string[]; highlight?: boolean }> = ({ plan, price, features, highlight }) => (
   <motion.div 
@@ -31,13 +31,44 @@ const PricingCard: React.FC<{ plan: string; price: string; features: string[]; h
   </motion.div>
 );
 
+const FaqItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-neutral-800">
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full py-6 flex items-center justify-between text-left focus:outline-none group"
+      >
+        <span className="text-lg font-medium text-neutral-200 group-hover:text-white transition-colors">{question}</span>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-brand-900/30 text-brand-500' : 'bg-neutral-900 text-neutral-400'}`}>
+          {isOpen ? <Minus size={16} /> : <Plus size={16} />}
+        </div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <p className="pb-6 text-neutral-400 leading-relaxed pr-8">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 function App() {
   return (
     <div className="bg-black min-h-screen text-white selection:bg-brand-500 selection:text-white">
       <Navbar />
       
       {/* Fixed Background 3D Scene */}
-      {/* We use suspense fallback to ensure smooth loading, though primitives load instantly */}
       <Suspense fallback={null}>
         <div className="fixed inset-0 z-0 pointer-events-none">
            <Scene />
@@ -114,6 +145,34 @@ function App() {
           </div>
         </section>
 
+        {/* FAQ Section */}
+        <section id="faq" className="py-24 bg-neutral-950 relative">
+           <div className="container mx-auto px-6 max-w-3xl">
+              <SectionTitle subtitle="Got questions? We've got answers.">
+                Frequently Asked Questions
+              </SectionTitle>
+              
+              <div className="mt-12">
+                <FaqItem 
+                  question="Does the browser extension work on Firefox?" 
+                  answer="Yes! Our extension works on Chrome, Firefox, Edge, and Safari. It syncs instantly to your mobile device regardless of the browser you use." 
+                />
+                <FaqItem 
+                  question="What happens if I miss a notification?" 
+                  answer="No worries. Missed reminders go into your 'Overdue' queue. We'll gently nudge you again in your Daily Digest, or you can reschedule them." 
+                />
+                <FaqItem 
+                  question="Is my data private?" 
+                  answer="Absolutely. Your bookmarks are encrypted in transit and at rest. We do not sell your reading habits to advertisers." 
+                />
+                <FaqItem 
+                  question="Can I export my bookmarks later?" 
+                  answer="Yes, data portability is key. You can export your entire library to CSV or HTML format at any time from the web dashboard." 
+                />
+              </div>
+           </div>
+        </section>
+
         {/* CTA Footer */}
         <section className="py-32 relative overflow-hidden">
            <div className="absolute inset-0 bg-brand-900/20"></div>
@@ -130,7 +189,7 @@ function App() {
              <p className="text-xl text-neutral-300 mb-10 max-w-2xl mx-auto">
                Download the extension and mobile app today.
              </p>
-             <Button primary className="text-lg px-10 py-4 shadow-xl">
+             <Button primary onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior: 'smooth'})} className="text-lg px-10 py-4 shadow-xl">
                Start Using Later
              </Button>
              <p className="mt-6 text-sm text-neutral-500">Available on iOS, Android, Chrome, and Safari</p>
@@ -141,8 +200,8 @@ function App() {
         <footer className="bg-neutral-950 border-t border-neutral-900 py-12 text-center md:text-left">
           <div className="container mx-auto px-6 grid md:grid-cols-4 gap-8">
              <div>
-               <h4 className="font-bold text-xl mb-4 flex items-center justify-center md:justify-start gap-2">
-                 <div className="w-6 h-6 bg-brand-600 rounded-md"></div> Later
+               <h4 className="font-bold text-xl mb-4 flex items-center justify-center md:justify-start gap-3">
+                 <LaterLogo className="w-6 h-auto" /> Later
                </h4>
                <p className="text-neutral-500 text-sm">
                  The smart bookmark manager that reminds you to actually consume your content.
@@ -151,9 +210,9 @@ function App() {
              <div>
                <h4 className="font-bold mb-4 text-white">Product</h4>
                <ul className="space-y-2 text-sm text-neutral-500">
-                 <li><a href="#" className="hover:text-brand-500">Browser Extension</a></li>
+                 <li><a href="#features" className="hover:text-brand-500">Features</a></li>
                  <li><a href="#" className="hover:text-brand-500">Mobile App</a></li>
-                 <li><a href="#" className="hover:text-brand-500">Pricing</a></li>
+                 <li><a href="#pricing" className="hover:text-brand-500">Pricing</a></li>
                </ul>
              </div>
              <div>
