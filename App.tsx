@@ -3,9 +3,9 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import Scene from './components/ThreeScene';
-import { Button, SectionTitle, GradientBlob, LaterLogo } from './components/UiComponents';
+import { Button, SectionTitle, GradientBlob } from './components/UiComponents';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Minus } from 'lucide-react';
+import { Check, Plus, Minus, Bookmark } from 'lucide-react';
 
 const PricingCard: React.FC<{ plan: string; price: string; features: string[]; highlight?: boolean }> = ({ plan, price, features, highlight }) => (
   <motion.div 
@@ -200,8 +200,8 @@ function App() {
         <footer className="bg-neutral-950 border-t border-neutral-900 py-12 text-center md:text-left">
           <div className="container mx-auto px-6 grid md:grid-cols-4 gap-8">
              <div>
-               <h4 className="font-bold text-xl mb-4 flex items-center justify-center md:justify-start gap-3">
-                 <LaterLogo className="w-6 h-auto" /> Later
+               <h4 className="font-bold text-xl mb-4 flex items-center justify-center md:justify-start gap-2">
+                 <Bookmark className="w-8 h-8 text-brand-600 fill-current" /> Later
                </h4>
                <p className="text-neutral-500 text-sm">
                  The smart bookmark manager that reminds you to actually consume your content.
